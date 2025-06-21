@@ -12,6 +12,12 @@ interface ToastState {
 
 interface GameStore extends GameState {
   toast: ToastState;
+  // Search state for evidence discovery
+  roomSearchState: Record<string, {
+    attempts: number;
+    maxAttempts: number;
+    discoveredHints: string[];
+  }>;
   // Actions
   addEvidence: (evidenceId: string) => void;
   updateNpcTrust: (characterId: string, change: number) => void;
@@ -24,6 +30,9 @@ interface GameStore extends GameState {
   resetGame: () => void;
   showToast: (title: string, message?: string, type?: 'success' | 'error' | 'warning' | 'info') => void;
   hideToast: () => void;
+  // New search actions
+  attemptSearch: (room: string) => boolean;
+  resetRoomSearch: (room: string) => void;
 }
 
 const initialGameState: GameState = {
@@ -62,6 +71,7 @@ export const useGameStore = create<GameStore>()(
         message: '',
         type: 'info'
       },
+      roomSearchState: {},
 
       // Add evidence to player's inventory
       addEvidence: (evidenceId: string) =>
@@ -123,7 +133,8 @@ export const useGameStore = create<GameStore>()(
             title: '',
             message: '',
             type: 'info'
-          }
+          },
+          roomSearchState: {}
         }),
 
       // Toast actions
@@ -144,6 +155,28 @@ export const useGameStore = create<GameStore>()(
             isOpen: false
           }
         })),
+
+      // New search actions
+      attemptSearch: (room: string) => {
+        set((state) => ({
+          roomSearchState: {
+            ...state.roomSearchState,
+            [room]: {
+              attempts: (state.roomSearchState[room]?.attempts || 0) + 1,
+              maxAttempts: 3,
+              discoveredHints: [],
+            },
+          },
+        }));
+        return true;
+      },
+
+             resetRoomSearch: (room: string) =>
+         set((state) => {
+           const newState = { ...state.roomSearchState };
+           delete newState[room];
+           return { roomSearchState: newState };
+         }),
     }),
     {
       name: 'mystery-game-storage',
@@ -157,6 +190,7 @@ export const useGameStore = create<GameStore>()(
         npcEmotionalState: state.npcEmotionalState,
         conversationHistory: state.conversationHistory,
         gameFlags: state.gameFlags,
+        roomSearchState: state.roomSearchState,
       }),
     }
   )

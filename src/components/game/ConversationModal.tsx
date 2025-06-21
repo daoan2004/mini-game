@@ -163,11 +163,22 @@ export default function ConversationModal({
     } catch (error) {
       console.error('Conversation error:', error);
       
-      // Fallback response
+      // Better error handling with helpful messages
+      let fallbackText = "Tôi... xin lỗi, tôi quá xúc động để nói chuyện bây giờ.";
+      
+      // Check if it's an API configuration issue
+      if (error instanceof Error) {
+        if (error.message.includes('API') || error.message.includes('500')) {
+          fallbackText = "⚠️ AI đang bảo trì. Hãy thử nói chuyện với nhân vật khác hoặc reset game.";
+        } else if (error.message.includes('429') || error.message.includes('QUOTA')) {
+          fallbackText = "⏳ Quá nhiều câu hỏi trong 1 phút. Hãy đợi 30 giây rồi thử lại.";
+        }
+      }
+      
       const fallbackMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'character',
-        text: "Tôi... xin lỗi, tôi quá xúc động để nói chuyện bây giờ.",
+        text: fallbackText,
         timestamp: Date.now()
       };
       

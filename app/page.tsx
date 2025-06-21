@@ -2,21 +2,22 @@
 
 import { useState } from 'react';
 import { getAliveCharacters } from '../src/data/characters';
-import { getEvidenceInRoom, getAllEvidence } from '../src/data/evidence';
+import { getAllEvidence } from '../src/data/evidence';
 import { getRoom } from '../src/data/rooms';
 import CharacterCard from '../src/components/game/CharacterCard';
 import EvidenceCard from '../src/components/game/EvidenceCard';
 import ConversationModal from '../src/components/game/ConversationModal';
 import { AccusationModal } from '../src/components/game/AccusationModal';
 import InvestigationPanel from '../src/components/game/InvestigationPanel';
+import SearchArea from '../src/components/game/SearchArea';
+import APIStatusIndicator from '../src/components/game/APIStatusIndicator';
 import Toast from '../src/components/ui/Toast';
 import { useGameStore } from '../src/stores/gameStore';
 import { Character } from '../src/types/game';
 
 export default function Home() {
-  const { gamePhase, currentRoom, evidenceFound, addEvidence, toast, showToast, hideToast } = useGameStore();
+  const { gamePhase, currentRoom, evidenceFound, addEvidence, toast, hideToast } = useGameStore();
   const characters = getAliveCharacters();
-  const roomEvidence = getEvidenceInRoom(currentRoom);
   const allEvidence = getAllEvidence();
   const currentRoomData = getRoom(currentRoom);
   
@@ -116,34 +117,7 @@ export default function Home() {
           </div>
           
           <h3 className="text-base md:text-lg font-semibold mb-3">🔍 Tìm Kiếm Bằng Chứng</h3>
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-6">
-            {roomEvidence.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">
-                Không có bằng chứng trong phòng này...
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 md:gap-4">
-                {roomEvidence.map((evidence, index) => (
-                  <div 
-                    key={evidence.id}
-                    className="animate-in fade-in-0 zoom-in-95 duration-300"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <EvidenceCard
-                      evidence={evidence}
-                      isClickable={!evidenceFound.includes(evidence.id)}
-                      onClick={() => {
-                        if (!evidenceFound.includes(evidence.id)) {
-                          addEvidence(evidence.id);
-                          showToast(`Tìm thấy: ${evidence.name}!`, `Bằng chứng đã được thêm vào kho.`, 'success');
-                        }
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <SearchArea currentRoom={currentRoom} />
         </div>
 
         {/* Evidence Inventory */}
@@ -247,6 +221,9 @@ export default function Home() {
         isOpen={isAccusationOpen}
         onClose={() => setIsAccusationOpen(false)}
       />
+
+      {/* API Status Indicator */}
+      <APIStatusIndicator />
 
       {/* Toast Notification */}
       <Toast
