@@ -78,15 +78,18 @@ export default function CharacterCard({
           {showTrustLevel && (
             <div className="mt-2 space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-slate-500">Trust:</span>
+                <span className="text-xs text-slate-500">Tin cậy:</span>
                 <span className={`text-xs font-medium ${getTrustColor(trustLevel)}`}>
                   {trustLevel}%
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-slate-500">Mood:</span>
+                <span className="text-xs text-slate-500">Tâm trạng:</span>
                 <span className={`text-xs font-medium capitalize ${getEmotionColor(emotionalState)}`}>
-                  {emotionalState}
+                  {emotionalState === 'calm' ? 'bình tĩnh' :
+                   emotionalState === 'nervous' ? 'lo lắng' :
+                   emotionalState === 'defensive' ? 'phòng thủ' :
+                   emotionalState === 'angry' ? 'tức giận' : emotionalState}
                 </span>
               </div>
             </div>

@@ -30,11 +30,11 @@ export default function EvidenceCard({
   };
   
   const getRarityLabel = () => {
-    if (evidence.isRedHerring) return 'Red Herring';
+    if (evidence.isRedHerring) return 'Bằng chứng giả';
     if (['wine_glass', 'threatening_letter', 'spare_key', 'diary_page'].includes(evidence.id)) {
-      return 'Critical Evidence';
+      return 'Bằng chứng quan trọng';
     }
-    return 'Evidence';
+    return 'Bằng chứng';
   };
 
   return (
@@ -81,13 +81,13 @@ export default function EvidenceCard({
       <div className="space-y-2">
         <div className="flex items-start justify-between">
           <h3 className={`font-semibold text-sm ${isDiscovered ? 'text-white' : 'text-slate-400'}`}>
-            {isDiscovered ? evidence.name : 'Undiscovered Evidence'}
+            {isDiscovered ? evidence.name : 'Bằng chứng chưa khám phá'}
           </h3>
         </div>
 
         {/* Evidence Type */}
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-slate-500">Type:</span>
+          <span className="text-xs text-slate-500">Loại:</span>
           <span className={`text-xs font-medium ${
             evidence.isRedHerring ? 'text-red-400' : 'text-green-400'
           }`}>
@@ -98,7 +98,7 @@ export default function EvidenceCard({
         {/* Related Character */}
         {isDiscovered && evidence.relatedCharacter && (
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-slate-500">Related to:</span>
+            <span className="text-xs text-slate-500">Liên quan đến:</span>
             <span className="text-xs font-medium text-blue-400 capitalize">
               {evidence.relatedCharacter}
             </span>
@@ -118,7 +118,7 @@ export default function EvidenceCard({
         {!isDiscovered && isClickable && (
           <div className="mt-3 pt-3 border-t border-slate-700">
             <p className="text-xs text-slate-500 text-center italic">
-              Click to investigate...
+              Nhấn để điều tra...
             </p>
           </div>
         )}

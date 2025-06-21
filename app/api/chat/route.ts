@@ -10,14 +10,14 @@ export async function POST(request: NextRequest) {
 
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: 'Cần có prompt' },
         { status: 400 }
       );
     }
 
     if (!process.env.GOOGLE_API_KEY) {
       return NextResponse.json(
-        { error: 'Google API key not configured' },
+        { error: 'API key chưa được cấu hình' },
         { status: 500 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Basic content validation
     if (!text || text.length < 5) {
-      throw new Error('Invalid AI response');
+      throw new Error('Phản hồi AI không hợp lệ');
     }
 
     return NextResponse.json({
@@ -46,21 +46,21 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       if (error.message.includes('API_KEY')) {
         return NextResponse.json(
-          { error: 'API configuration error' },
+          { error: 'Lỗi cấu hình API' },
           { status: 500 }
         );
       }
       
       if (error.message.includes('QUOTA')) {
         return NextResponse.json(
-          { error: 'API quota exceeded' },
+          { error: 'Đã vượt quá giới hạn API' },
           { status: 429 }
         );
       }
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Lỗi máy chủ nội bộ' },
       { status: 500 }
     );
   }

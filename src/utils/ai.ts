@@ -115,7 +115,7 @@ export async function getCharacterResponse(
     const fallbackResponse = getFallbackResponse(characterId, userMessage, gameState);
     return { 
       response: fallbackResponse, 
-      error: 'AI temporarily unavailable' 
+      error: 'AI tạm thời không khả dụng' 
     };
   }
 }

@@ -145,7 +145,7 @@ export function getNextEvidenceHint(discoveredEvidence: string[], currentRoom: s
   
   if (undiscoveredInRoom.length > 0) {
     const nextEvidence = EVIDENCE_ITEMS[undiscoveredInRoom[0]];
-    return `Something seems out of place near the ${nextEvidence.name.toLowerCase()}...`;
+    return `Có gì đó khác thường gần ${nextEvidence.name.toLowerCase()}...`;
   }
   
   return null;

@@ -105,10 +105,10 @@ export default function Home() {
 
         {/* Current Room */}
         <div className="mb-6 md:mb-8">
-          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">🏠 {currentRoomData?.name || 'Unknown Room'}</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">🏠 {currentRoomData?.name || 'Phòng Không Xác Định'}</h2>
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-6 mb-3 md:mb-4">
             <p className="text-slate-300 leading-relaxed mb-2">
-              {currentRoomData?.description || 'You find yourself in an unfamiliar place.'}
+              {currentRoomData?.description || 'Bạn thấy mình ở một nơi xa lạ.'}
             </p>
             <p className="text-slate-400 text-sm italic">
               {currentRoomData?.atmosphere || ''}
