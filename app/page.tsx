@@ -74,10 +74,10 @@ export default function Home() {
       <header className="bg-slate-800 border-b border-slate-700 p-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-center mb-2">
-            🕵️ AI Mystery Game
+            🕵️ Bí Ẩn Marlene Harrington
           </h1>
           <p className="text-slate-400 text-center">
-            Bóng ma biệt thự Gilmore
+            Game Trinh Thám AI - Giải Quyết Bí Ẩn Cái Chết
           </p>
           
           {/* Game Status */}

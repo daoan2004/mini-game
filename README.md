@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🕵️ Bí Ẩn Marlene Harrington - Game Trinh Thám AI
 
-## Getting Started
+Trò chơi trinh thám tương tác sử dụng AI để giải quyết bí ẩn cái chết của Marlene Harrington tại biệt thự cổ.
 
-First, run the development server:
+## 🎮 Về Game
 
+**Bí Ẩn Marlene Harrington** là một trò chơi trinh thám tương tác được phát triển bằng Next.js và tích hợp AI. Người chơi vào vai thám tử điều tra vụ án bí ẩn trong biệt thự cổ.
+
+### 🎯 Tính Năng Chính
+
+- **🤖 AI Thông Minh**: Hệ thống AI hỗ trợ gợi ý câu hỏi và phân tích bằng chứng
+- **🔍 Điều Tra Tương Tác**: Tìm kiếm bằng chứng, phỏng vấn nhân vật
+- **🧪 Phòng Lab Phân Tích**: Mini-game phân tích bằng chứng với các công cụ chuyên nghiệp
+- **📊 Hệ Thống Deduction**: Bảng suy luận để kết nối manh mối
+- **🏆 Achievements**: Hệ thống thành tích và điểm số
+- **💾 Save/Load**: Lưu và tải tiến trình game
+- **📱 Responsive**: Tối ưu cho mọi thiết bị
+
+### 🎭 Cốt Truyện
+
+Đêm giông bão năm 1993, bà Marlene Harrington được phát hiện chết trong phòng riêng tại biệt thự cổ. Cửa phòng khóa từ bên trong, không có dấu hiệu đột nhập. Trước đó bà vừa tuyên bố sẽ thay đổi di chúc...
+
+## 🚀 Cài Đặt và Chạy Game
+
+### Yêu Cầu Hệ Thống
+- Node.js 18.0 hoặc cao hơn
+- NPM hoặc Yarn
+
+### Cài Đặt
+
+1. **Clone repository:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd mystery-game
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Cài đặt dependencies:**
+```bash
+npm install
+# hoặc
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Tạo file môi trường:**
+```bash
+cp .env.local.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Thêm API key Google Gemini vào `.env.local`:**
+```env
+GOOGLE_API_KEY=your_gemini_api_key_here
+```
 
-## Learn More
+### Chạy Game
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Development mode
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Production build
+npm run build
+npm run start
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Lint code
+npm run lint
+```
 
-## Deploy on Vercel
+Mở [http://localhost:3000](http://localhost:3000) để chơi game.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Công Nghệ Sử Dụng
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **AI Integration**: Google Gemini AI
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+
+## 🎮 Hướng Dẫn Chơi
+
+1. **Điều Tra**: Di chuyển giữa các phòng trong biệt thự
+2. **Thu Thập Bằng Chứng**: Tìm kiếm và phân tích các manh mối
+3. **Phỏng Vấn**: Nói chuyện với các nhân vật nghi ngờ
+4. **Phân Tích**: Sử dụng phòng lab để nghiên cứu bằng chứng
+5. **Suy Luận**: Kết nối các manh mối trên bảng deduction
+6. **Buộc Tội**: Đưa ra kết luận cuối cùng
+
+## 🏗️ Cấu Trúc Dự Án
+
+```
+mystery-game/
+├── app/                    # Next.js App Router
+├── src/
+│   ├── components/         # React Components
+│   │   ├── game/          # Game-specific components
+│   │   ├── layout/        # Layout components
+│   │   └── ui/            # UI components
+│   ├── data/              # Game data (characters, evidence, rooms)
+│   ├── hooks/             # Custom React hooks
+│   ├── stores/            # Zustand stores
+│   ├── types/             # TypeScript types
+│   └── utils/             # Utility functions
+└── public/                # Static assets
+    └── images/            # Game images
+```
+
+## 🤝 Đóng Góp
+
+Mọi đóng góp đều được chào đón! Hãy tạo issue hoặc pull request.
+
+## 📄 License
+
+Dự án này được phát hành dưới MIT License.
+
+## 🎯 Roadmap
+
+- [ ] Thêm nhiều kịch bản mystery khác nhau
+- [ ] Multiplayer mode
+- [ ] Mobile app version
+- [ ] Hệ thống ranking toàn cầu
+- [ ] Mod support
+
+---
+
+**Chúc bạn chơi game vui vẻ và tìm ra hung thủ thật sự! 🕵️‍♂️**

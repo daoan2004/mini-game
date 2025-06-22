@@ -1,7 +1,9 @@
 {
-  "name": "mystery-game",
-  "version": "0.1.0",
+  "name": "marlene-mystery-detective-game",
+  "version": "1.0.0",
   "private": true,
+  "description": "Trò chơi trinh thám giải bí ẩn cái chết của Marlene Harrington",
+  "author": "Mystery Game Studio",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
