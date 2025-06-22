@@ -417,18 +417,18 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 };
 
 // Utility functions for easy use
-export const showSuccessToast = (title: string, message?: string) => {
+export const showSuccessToast = () => {
   // This will be used with the hook
 };
 
-export const showErrorToast = (title: string, message?: string) => {
+export const showErrorToast = () => {
   // This will be used with the hook
 };
 
-export const showWarningToast = (title: string, message?: string) => {
+export const showWarningToast = () => {
   // This will be used with the hook
 };
 
-export const showInfoToast = (title: string, message?: string) => {
+export const showInfoToast = () => {
   // This will be used with the hook
 };

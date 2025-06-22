@@ -143,9 +143,8 @@ export default function InvestigationPanel() {
         <EvidenceLab
           isOpen={showEvidenceLab}
           onClose={() => setShowEvidenceLab(false)}
-          evidenceList={discoveredEvidence}
-          onAnalysisComplete={(insights) => {
-            console.log('Lab analysis completed:', insights);
+          onAnalysisComplete={(evidenceId) => {
+            console.log('Lab analysis completed for:', evidenceId);
             // Could trigger achievements or add insights to game state
           }}
         />

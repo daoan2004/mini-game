@@ -229,13 +229,14 @@ export default function ConversationModal({
       isOpen={isOpen} 
       onClose={onClose} 
       title={`Hội thoại với ${character.name}`}
-      size="xl"
+      size="2xl"
+      className="h-[95vh]"
     >
-      <div className="flex flex-col md:flex-row gap-4 h-[80vh] md:h-[700px]">
-        {/* Left Panel - Chat */}
-        <div className="flex-1 flex flex-col min-w-0 md:min-h-0">
+      <div className="flex flex-col lg:flex-row gap-4 h-full">
+                {/* Left Panel - Chat */}
+        <div className="flex-1 flex flex-col min-w-0 lg:min-h-0">
           {/* Character Info */}
-        <div className="flex items-center space-x-3 md:space-x-4 bg-slate-700 rounded-lg p-3 md:p-4 mb-3 md:mb-4">
+          <div className="flex items-center space-x-3 bg-slate-700 rounded-lg p-3 mb-3 flex-shrink-0">
           <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-600 rounded-full flex items-center justify-center">
             {character.avatar ? (
               <Image 
@@ -283,7 +284,7 @@ export default function ConversationModal({
         </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 mb-3 md:mb-4 p-1 md:p-2">
+          <div className="flex-1 overflow-y-auto space-y-3 mb-3 p-2 min-h-0">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -321,54 +322,57 @@ export default function ConversationModal({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Evidence Selection */}
-          {evidenceFound.length > 0 && (
-            <div className="mb-4">
-              <label className="text-sm text-slate-400 mb-2 block">
-                Trình bày bằng chứng (tùy chọn):
-              </label>
-              <select
-                value={selectedEvidence}
-                onChange={(e) => setSelectedEvidence(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"
-              >
-                <option value="">Không có bằng chứng</option>
-                {evidenceFound.map((evidenceId) => {
-                  const evidence = EVIDENCE_ITEMS[evidenceId];
-                  return (
-                    <option key={evidenceId} value={evidenceId}>
-                      {evidence ? evidence.name : evidenceId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          )}
+          {/* Input Section */}
+          <div className="flex-shrink-0 space-y-3">
+            {/* Evidence Selection */}
+            {evidenceFound.length > 0 && (
+              <div>
+                <label className="text-sm text-slate-400 mb-2 block">
+                  Trình bày bằng chứng (tùy chọn):
+                </label>
+                <select
+                  value={selectedEvidence}
+                  onChange={(e) => setSelectedEvidence(e.target.value)}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"
+                >
+                  <option value="">Không có bằng chứng</option>
+                  {evidenceFound.map((evidenceId) => {
+                    const evidence = EVIDENCE_ITEMS[evidenceId];
+                    return (
+                      <option key={evidenceId} value={evidenceId}>
+                        {evidence ? evidence.name : evidenceId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
 
-          {/* Input */}
-          <div className="flex space-x-2 md:space-x-3">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Đặt câu hỏi hoặc buộc tội..."
-              className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 md:px-4 py-2 md:py-3 text-sm md:text-base text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputText.trim() || isLoading}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
-            >
-              Gửi
-            </button>
+            {/* Input */}
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Đặt câu hỏi hoặc buộc tội..."
+                className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim() || isLoading}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex-shrink-0"
+              >
+                Gửi
+              </button>
+            </div>
           </div>
         </div>
         
         {/* Right Panel - AI Suggestions */}
         {showSmartQuestions && (
-          <div className="w-full md:w-80 flex-shrink-0 overflow-y-auto max-h-96 md:max-h-none">
+          <div className="w-full lg:w-80 flex-shrink-0 overflow-y-auto max-h-96 lg:max-h-none">
             <SmartQuestionPanel
               character={character}
               onQuestionSelect={handleQuestionSelect}

@@ -78,26 +78,26 @@ export function SmartQuestionPanel({ character, onQuestionSelect, isVisible }: S
   };
 
   return (
-    <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 mb-3">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 mb-3 h-full flex flex-col">
+      <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <h3 className="text-base font-semibold text-white flex items-center gap-2">
           🤖 Gợi Ý AI
         </h3>
         <button
           onClick={() => setShowHints(!showHints)}
-          className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
-          {showHints ? 'Ẩn gợi ý' : 'Hiện gợi ý'}
+          {showHints ? 'Ẩn' : 'Hiện'}
         </button>
       </div>
 
       {/* Contextual Hints */}
       {showHints && hints.length > 0 && (
-        <div className="mb-4 p-3 bg-blue-900 bg-opacity-50 rounded border border-blue-500">
-          <h4 className="text-sm font-medium text-blue-300 mb-2">💡 Gợi ý chiến thuật:</h4>
+        <div className="mb-3 p-2 bg-blue-900 bg-opacity-50 rounded border border-blue-500 flex-shrink-0">
+          <h4 className="text-xs font-medium text-blue-300 mb-1">💡 Gợi ý:</h4>
           <div className="space-y-1">
-            {hints.map((hint, index) => (
-              <div key={index} className="text-sm text-blue-200">
+            {hints.slice(0, 2).map((hint, index) => (
+              <div key={index} className="text-xs text-blue-200">
                 {hint}
               </div>
             ))}
@@ -106,20 +106,20 @@ export function SmartQuestionPanel({ character, onQuestionSelect, isVisible }: S
       )}
 
       {/* Trust Level Indicator */}
-      <div className="mb-4 p-2 bg-slate-700 rounded">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-300">Độ tin tưởng:</span>
+      <div className="mb-3 p-2 bg-slate-700 rounded flex-shrink-0">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-slate-300">Tin tưởng:</span>
           <div className="flex items-center gap-2">
-            <div className="w-24 bg-slate-600 rounded-full h-2">
+            <div className="w-16 bg-slate-600 rounded-full h-1.5">
               <div 
-                className={`h-2 rounded-full transition-all ${
+                className={`h-1.5 rounded-full transition-all ${
                   trustLevel >= 70 ? 'bg-green-500' :
                   trustLevel >= 40 ? 'bg-yellow-500' : 'bg-red-500'
                 }`}
                 style={{ width: `${trustLevel}%` }}
               />
             </div>
-            <span className={`font-medium ${
+            <span className={`font-medium text-xs ${
               trustLevel >= 70 ? 'text-green-400' :
               trustLevel >= 40 ? 'text-yellow-400' : 'text-red-400'
             }`}>
@@ -130,13 +130,13 @@ export function SmartQuestionPanel({ character, onQuestionSelect, isVisible }: S
       </div>
 
       {/* Category Filter */}
-      <div className="mb-4">
-        <div className="flex flex-wrap gap-2">
-          {categories.map(category => (
+      <div className="mb-3 flex-shrink-0">
+        <div className="flex flex-wrap gap-1">
+          {categories.slice(0, 4).map(category => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1 text-xs rounded transition-colors ${
+              className={`px-2 py-1 text-xs rounded transition-colors ${
                 selectedCategory === category
                   ? 'bg-purple-600 text-white'
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
@@ -149,71 +149,50 @@ export function SmartQuestionPanel({ character, onQuestionSelect, isVisible }: S
       </div>
 
       {/* Question Suggestions */}
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {filteredSuggestions.length === 0 ? (
-          <div className="text-center py-6 text-slate-400">
-            <div className="text-4xl mb-2">🤔</div>
-            <p>Không có câu hỏi phù hợp.</p>
-            <p className="text-sm mt-1">Hãy tìm thêm bằng chứng hoặc thử danh mục khác.</p>
+          <div className="text-center py-4 text-slate-400">
+            <div className="text-2xl mb-1">🤔</div>
+            <p className="text-xs">Không có câu hỏi phù hợp.</p>
           </div>
         ) : (
-          filteredSuggestions.map((suggestion) => (
-            <div
-              key={suggestion.id}
-              className={`border-l-4 p-3 rounded-r cursor-pointer transition-all hover:shadow-md ${getPriorityColor(suggestion.priority)}`}
-              onClick={() => onQuestionSelect(suggestion.text)}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{getTypeIcon(suggestion.type)}</span>
-                  <span className="text-xs font-medium px-2 py-1 bg-white bg-opacity-20 rounded">
-                    {suggestion.category}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 text-xs">
-                  <span>Ưu tiên: {suggestion.priority}</span>
-                  <span>{getReactionIcon(suggestion.expectedReaction)}</span>
-                </div>
-              </div>
-              
-              <p className="text-sm font-medium mb-2 leading-relaxed">
-                {suggestion.text}
-              </p>
-              
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-opacity-70">
-                  Phản ứng dự kiến: {suggestion.expectedReaction}
-                </span>
-                {suggestion.requiredEvidence && (
-                  <span className="text-opacity-70">
-                    Cần: {suggestion.requiredEvidence.join(', ')}
-                  </span>
-                )}
-              </div>
-
-              {/* Follow-up questions preview */}
-              {suggestion.followUpQuestions && suggestion.followUpQuestions.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-white border-opacity-20">
-                  <div className="text-xs text-opacity-70 mb-1">Câu hỏi tiếp theo:</div>
-                  <div className="text-xs space-y-1">
-                    {suggestion.followUpQuestions.slice(0, 2).map((followUp, i) => (
-                      <div key={i} className="text-opacity-60">• {followUp}</div>
-                    ))}
+          <div className="space-y-2">
+            {filteredSuggestions.slice(0, 6).map((suggestion) => (
+              <div
+                key={suggestion.id}
+                className={`border-l-4 p-2 rounded-r cursor-pointer transition-all hover:shadow-md ${getPriorityColor(suggestion.priority)}`}
+                onClick={() => onQuestionSelect(suggestion.text)}
+              >
+                <div className="flex items-start justify-between mb-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm">{getTypeIcon(suggestion.type)}</span>
+                    <span className="text-xs font-medium px-1 py-0.5 bg-white bg-opacity-20 rounded">
+                      {suggestion.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs">
+                    <span className="text-xs">P{suggestion.priority}</span>
+                    <span className="text-xs">{getReactionIcon(suggestion.expectedReaction)}</span>
                   </div>
                 </div>
-              )}
-            </div>
-          ))
+                
+                <p className="text-xs font-medium mb-1 leading-relaxed">
+                  {suggestion.text}
+                </p>
+                
+                <div className="text-xs opacity-70">
+                  {suggestion.expectedReaction}
+                </div>
+              </div>
+            ))}
+            
+            {filteredSuggestions.length > 6 && (
+              <div className="text-center text-xs text-slate-400 py-2">
+                +{filteredSuggestions.length - 6} câu hỏi khác...
+              </div>
+            )}
+          </div>
         )}
-      </div>
-
-      {/* Quick Stats */}
-      <div className="mt-4 pt-3 border-t border-slate-600 text-xs text-slate-400">
-        <div className="flex justify-between">
-          <span>Tổng câu hỏi: {suggestions.length}</span>
-          <span>Bằng chứng: {evidenceFound.length}</span>
-          <span>Đã hỏi: {conversationHistory.filter(msg => msg.characterId === character.id).length}</span>
-        </div>
       </div>
     </div>
   );

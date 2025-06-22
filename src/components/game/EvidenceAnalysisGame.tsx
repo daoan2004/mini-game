@@ -54,7 +54,6 @@ export default function EvidenceAnalysisGame({
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [currentChallenge, setCurrentChallenge] = useState(0);
   const [challengeAnswers, setChallengeAnswers] = useState<number[]>([]);
-  const [showResults, setShowResults] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [filter, setFilter] = useState('normal');
@@ -269,7 +268,7 @@ export default function EvidenceAnalysisGame({
   }, [evidence.id]);
 
   // Handle tool usage
-  const useTool = (toolId: string) => {
+  const handleToolUse = (toolId: string) => {
     const tool = tools.find(t => t.id === toolId);
     if (!tool || analysisPoints < tool.cost) return;
 
@@ -381,151 +380,166 @@ export default function EvidenceAnalysisGame({
   };
 
   const renderAnalysisPhase = () => (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-4">
       {/* Header */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">🔬 Phòng Lab Phân Tích</h2>
-        <p className="text-slate-300">Sử dụng các công cụ để phân tích bằng chứng</p>
-        <div className="mt-2 text-blue-400 font-medium">
-          Điểm phân tích: {analysisPoints}
-        </div>
-      </div>
-
-      {/* Evidence Display */}
-      <div className="bg-slate-800 rounded-lg p-4">
-        <div className="relative">
-          <div className="w-full h-64 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
-            <div 
-              className={`transition-all duration-300 ${getFilterClass()}`}
-              style={{ transform: `scale(${zoom})` }}
-            >
-              {evidence.image ? (
-                <Image
-                  src={evidence.image}
-                  alt={evidence.name}
-                  width={300}
-                  height={300}
-                  className="object-contain rounded-lg"
-                />
-              ) : (
-                <div className="w-48 h-48 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-6xl">
-                  🔍
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Zoom Controls */}
-          <div className="mt-3 flex justify-center gap-2">
-            <button
-              onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              🔍- Zoom Out
-            </button>
-            <span className="px-3 py-1 bg-slate-700 text-white rounded text-sm">
-              {Math.round(zoom * 100)}%
-            </span>
-            <button
-              onClick={() => setZoom(Math.min(3, zoom + 0.25))}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              🔍+ Zoom In
-            </button>
-          </div>
-
-          {/* Filter Controls */}
-          <div className="mt-3 flex justify-center gap-2 flex-wrap">
-            {[
-              { id: 'normal', name: 'Bình thường', icon: '👁️' },
-              { id: 'contrast', name: 'Tương phản', icon: '🔆' },
-              { id: 'grayscale', name: 'Đen trắng', icon: '⚫' },
-              { id: 'uv', name: 'Ánh sáng UV', icon: '💜' }
-            ].map(filterOption => (
-              <button
-                key={filterOption.id}
-                onClick={() => setFilter(filterOption.id)}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
-                  filter === filterOption.id
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                {filterOption.icon} {filterOption.name}
-              </button>
-            ))}
+      <div className="text-center flex-shrink-0">
+        <h2 className="text-xl font-bold text-white mb-2">🔬 Phòng Lab Phân Tích</h2>
+        <div className="flex justify-center items-center gap-4 text-sm">
+          <span className="text-slate-300">Sử dụng các công cụ để phân tích bằng chứng</span>
+          <div className="text-blue-400 font-medium bg-blue-900/30 px-3 py-1 rounded-full">
+            Điểm: {analysisPoints}
           </div>
         </div>
       </div>
 
-      {/* Analysis Tools */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {tools.map(tool => (
-          <button
-            key={tool.id}
-            onClick={() => useTool(tool.id)}
-            disabled={analysisPoints < tool.cost || !tool.unlocked}
-            className={`p-4 rounded-lg border-2 transition-all ${
-              selectedTool === tool.id
-                ? 'border-blue-500 bg-blue-900'
-                : analysisPoints >= tool.cost && tool.unlocked
-                ? 'border-slate-600 bg-slate-800 hover:border-blue-400'
-                : 'border-slate-700 bg-slate-900 opacity-50 cursor-not-allowed'
-            }`}
-          >
-            <div className="text-2xl mb-2">{tool.icon}</div>
-            <div className="text-white font-medium text-sm">{tool.name}</div>
-            <div className="text-slate-400 text-xs mt-1">{tool.description}</div>
-            <div className="text-blue-400 text-xs mt-2">
-              {tool.cost > 0 ? `${tool.cost} điểm` : 'Miễn phí'}
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Findings Display */}
-      {discoveredFindings.length > 0 && (
-        <div className="bg-slate-800 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-            🎯 Phát hiện ({discoveredFindings.length}/{findings.length})
-          </h3>
-          <div className="space-y-2">
-            {findings.filter(f => f.discovered).map(finding => (
-              <div
-                key={finding.id}
-                className={`p-3 rounded border-l-4 ${
-                  finding.importance === 'critical' ? 'border-red-500 bg-red-900 bg-opacity-20' :
-                  finding.importance === 'high' ? 'border-orange-500 bg-orange-900 bg-opacity-20' :
-                  finding.importance === 'medium' ? 'border-yellow-500 bg-yellow-900 bg-opacity-20' :
-                  'border-gray-500 bg-gray-900 bg-opacity-20'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-medium text-white">{finding.title}</h4>
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    finding.importance === 'critical' ? 'bg-red-600 text-white' :
-                    finding.importance === 'high' ? 'bg-orange-600 text-white' :
-                    finding.importance === 'medium' ? 'bg-yellow-600 text-black' :
-                    'bg-gray-600 text-white'
-                  }`}>
-                    {finding.importance === 'critical' ? 'Rất quan trọng' :
-                     finding.importance === 'high' ? 'Quan trọng' :
-                     finding.importance === 'medium' ? 'Trung bình' : 'Thấp'}
-                  </span>
+      {/* Main Content - Two Column Layout */}
+      <div className="flex-1 flex gap-4 min-h-0">
+        {/* Left Panel - Evidence Display */}
+        <div className="flex-1 flex flex-col">
+          <div className="bg-slate-800 rounded-lg p-4 h-full flex flex-col">
+            <div className="relative flex-1">
+              <div className="w-full h-full bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
+                <div 
+                  className={`transition-all duration-300 ${getFilterClass()}`}
+                  style={{ transform: `scale(${zoom})` }}
+                >
+                  {evidence.image ? (
+                    <Image
+                      src={evidence.image}
+                      alt={evidence.name}
+                      width={300}
+                      height={300}
+                      className="object-contain rounded-lg max-h-full"
+                    />
+                  ) : (
+                    <div className="w-48 h-48 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-6xl">
+                      🔍
+                    </div>
+                  )}
                 </div>
-                <p className="text-slate-300 text-sm">{finding.description}</p>
               </div>
-            ))}
+
+              {/* Controls */}
+              <div className="mt-3 space-y-2">
+                {/* Zoom Controls */}
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
+                    className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
+                  >
+                    🔍- 
+                  </button>
+                  <span className="px-2 py-1 bg-slate-700 text-white rounded text-xs min-w-[60px] text-center">
+                    {Math.round(zoom * 100)}%
+                  </span>
+                  <button
+                    onClick={() => setZoom(Math.min(3, zoom + 0.25))}
+                    className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
+                  >
+                    🔍+
+                  </button>
+                </div>
+
+                {/* Filter Controls */}
+                <div className="flex justify-center gap-1 flex-wrap">
+                  {[
+                    { id: 'normal', name: 'Bình thường', icon: '👁️' },
+                    { id: 'contrast', name: 'Tương phản', icon: '🔆' },
+                    { id: 'grayscale', name: 'Đen trắng', icon: '⚫' },
+                    { id: 'uv', name: 'UV', icon: '💜' }
+                  ].map(filterOption => (
+                    <button
+                      key={filterOption.id}
+                      onClick={() => setFilter(filterOption.id)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        filter === filterOption.id
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      {filterOption.icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Right Panel - Tools and Findings */}
+        <div className="w-80 flex flex-col gap-4">
+          {/* Analysis Tools */}
+          <div className="bg-slate-800 rounded-lg p-3">
+            <h3 className="text-sm font-semibold text-white mb-3">🛠️ Công cụ phân tích</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {tools.map(tool => (
+                <button
+                  key={tool.id}
+                  onClick={() => handleToolUse(tool.id)}
+                  disabled={analysisPoints < tool.cost || !tool.unlocked}
+                  className={`p-2 rounded-lg border transition-all text-xs ${
+                    selectedTool === tool.id
+                      ? 'border-blue-500 bg-blue-900'
+                      : analysisPoints >= tool.cost && tool.unlocked
+                      ? 'border-slate-600 bg-slate-700 hover:border-blue-400'
+                      : 'border-slate-700 bg-slate-900 opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="text-lg mb-1">{tool.icon}</div>
+                  <div className="text-white font-medium text-xs">{tool.name}</div>
+                  <div className="text-blue-400 text-xs">
+                    {tool.cost > 0 ? `${tool.cost}đ` : 'Free'}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Findings Display */}
+          {discoveredFindings.length > 0 && (
+            <div className="bg-slate-800 rounded-lg p-3 flex-1 min-h-0">
+              <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                🎯 Phát hiện ({discoveredFindings.length}/{findings.length})
+              </h3>
+              <div className="space-y-2 overflow-y-auto max-h-full">
+                {findings.filter(f => f.discovered).map(finding => (
+                  <div
+                    key={finding.id}
+                    className={`p-2 rounded border-l-4 text-xs ${
+                      finding.importance === 'critical' ? 'border-red-500 bg-red-900 bg-opacity-20' :
+                      finding.importance === 'high' ? 'border-orange-500 bg-orange-900 bg-opacity-20' :
+                      finding.importance === 'medium' ? 'border-yellow-500 bg-yellow-900 bg-opacity-20' :
+                      'border-gray-500 bg-gray-900 bg-opacity-20'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <h4 className="font-medium text-white text-xs">{finding.title}</h4>
+                      <span className={`text-xs px-1 py-0.5 rounded ${
+                        finding.importance === 'critical' ? 'bg-red-600 text-white' :
+                        finding.importance === 'high' ? 'bg-orange-600 text-white' :
+                        finding.importance === 'medium' ? 'bg-yellow-600 text-black' :
+                        'bg-gray-600 text-white'
+                      }`}>
+                        {finding.importance === 'critical' ? 'Rất quan trọng' :
+                         finding.importance === 'high' ? 'Quan trọng' :
+                         finding.importance === 'medium' ? 'Trung bình' : 'Thấp'}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-xs">{finding.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Continue Button */}
-      <div className="text-center">
+      <div className="text-center flex-shrink-0">
         <button
           onClick={startChallenges}
           disabled={discoveredFindings.length === 0}
-          className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+          className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
         >
           {discoveredFindings.length === 0 
             ? 'Hãy phân tích để tiếp tục' 
@@ -670,8 +684,14 @@ export default function EvidenceAnalysisGame({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`🔬 Phân tích: ${evidence.name}`} size="xl">
-      <div className="max-h-[80vh] overflow-y-auto">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={`🔬 Phân tích: ${evidence.name}`} 
+      size="2xl"
+      className="h-[95vh]"
+    >
+      <div className="h-full flex flex-col">
         {currentPhase === 'analysis' && renderAnalysisPhase()}
         {currentPhase === 'challenges' && renderChallengesPhase()}
         {currentPhase === 'results' && renderResultsPhase()}
