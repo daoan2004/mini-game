@@ -1,13 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { getInvestigationStatus, getInvestigationHints } from '../../utils/gameLogic';
+import EvidenceLab from './EvidenceLab';
+import { getAllEvidence } from '../../data/evidence';
 
 export default function InvestigationPanel() {
   const store = useGameStore();
   const status = getInvestigationStatus(store);
   const hints = getInvestigationHints(store);
+  const [showEvidenceLab, setShowEvidenceLab] = useState(false);
+  
+  const discoveredEvidence = getAllEvidence().filter(e => 
+    store.evidenceFound.includes(e.id)
+  );
 
   return (
     <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
@@ -118,6 +125,31 @@ export default function InvestigationPanel() {
           </div>
         </div>
       </div>
+
+      {/* Evidence Lab Button */}
+      {discoveredEvidence.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-700">
+          <button
+            onClick={() => setShowEvidenceLab(true)}
+            className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            🔬 Phòng Lab Phân Tích Bằng Chứng
+          </button>
+        </div>
+      )}
+
+      {/* Evidence Lab Modal */}
+      {showEvidenceLab && (
+        <EvidenceLab
+          isOpen={showEvidenceLab}
+          onClose={() => setShowEvidenceLab(false)}
+          evidenceList={discoveredEvidence}
+          onAnalysisComplete={(insights) => {
+            console.log('Lab analysis completed:', insights);
+            // Could trigger achievements or add insights to game state
+          }}
+        />
+      )}
     </div>
   );
 } 

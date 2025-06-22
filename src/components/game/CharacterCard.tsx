@@ -49,20 +49,36 @@ export default function CharacterCard({
     >
       {/* Character Avatar */}
       <div className="flex items-start space-x-3 md:space-x-4">
-        <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-700 rounded-full flex items-center justify-center">
+        <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-700 rounded-full flex items-center justify-center relative overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all duration-200">
           {character.avatar ? (
             <Image 
               src={character.avatar} 
               alt={character.name}
               width={64}
               height={64}
-              className="w-full h-full rounded-full object-cover"
+              className="w-full h-full rounded-full object-cover transition-all duration-200 hover:scale-105"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R611ojatSmVV5I3Q="
+              onError={(e) => {
+                // Fallback to initials if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
             />
-          ) : (
-            <span className="text-2xl text-slate-400">
-              {character.name.charAt(0)}
-            </span>
-          )}
+          ) : null}
+          
+          {/* Fallback initials - always present but hidden when image loads */}
+          <span className={`text-xl md:text-2xl text-slate-300 font-semibold absolute inset-0 flex items-center justify-center ${character.avatar ? 'hidden' : ''}`}>
+            {character.name.charAt(0)}
+          </span>
+          
+          {/* Loading indicator */}
+          <div className="absolute inset-0 bg-slate-600 rounded-full animate-pulse hidden" id={`loading-${character.id}`}>
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-4 h-4 bg-slate-400 rounded-full animate-bounce"></div>
+            </div>
+          </div>
         </div>
         
         <div className="flex-1">

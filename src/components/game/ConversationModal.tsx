@@ -8,6 +8,8 @@ import { EVIDENCE_ITEMS } from '../../data/evidence';
 import Modal from '../ui/Modal';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import Image from 'next/image';
+import { SmartQuestionPanel } from './SmartQuestionPanel';
+import { QuickEvidenceIntegration } from './QuickEvidenceIntegration';
 
 interface ConversationModalProps {
   isOpen: boolean;
@@ -41,6 +43,7 @@ export default function ConversationModal({
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedEvidence, setSelectedEvidence] = useState<string>('');
+  const [showSmartQuestions, setShowSmartQuestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const trustLevel = npcTrust[character.id] || 50;
@@ -196,6 +199,15 @@ export default function ConversationModal({
     }
   };
 
+  const handleQuestionSelect = (question: string) => {
+    setInputText(question);
+  };
+
+  const handleQuestionWithEvidence = (question: string, evidenceId: string) => {
+    setInputText(question);
+    setSelectedEvidence(evidenceId);
+  };
+
   const getTrustColor = (trust: number) => {
     if (trust >= 70) return 'text-green-400';
     if (trust >= 40) return 'text-yellow-400';
@@ -217,10 +229,12 @@ export default function ConversationModal({
       isOpen={isOpen} 
       onClose={onClose} 
       title={`Hội thoại với ${character.name}`}
-      size="lg"
+      size="xl"
     >
-      <div className="flex flex-col h-[70vh] md:h-[600px]">
-        {/* Character Info */}
+      <div className="flex flex-col md:flex-row gap-4 h-[80vh] md:h-[700px]">
+        {/* Left Panel - Chat */}
+        <div className="flex-1 flex flex-col min-w-0 md:min-h-0">
+          {/* Character Info */}
         <div className="flex items-center space-x-3 md:space-x-4 bg-slate-700 rounded-lg p-3 md:p-4 mb-3 md:mb-4">
           <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-600 rounded-full flex items-center justify-center">
             {character.avatar ? (
@@ -255,90 +269,119 @@ export default function ConversationModal({
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 mb-3 md:mb-4 p-1 md:p-2">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sender === 'player' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`
-                  max-w-[85%] md:max-w-[80%] p-2 md:p-3 rounded-lg
-                  ${message.sender === 'player' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-slate-700 text-slate-100'
-                  }
-                `}
-              >
-                <p className="text-sm">{message.text}</p>
-                {message.evidenceShown && (
-                  <div className="mt-2 pt-2 border-t border-slate-600">
-                    <p className="text-xs opacity-75">
-                      📋 Đã trình bày bằng chứng: {EVIDENCE_ITEMS[message.evidenceShown]?.name || message.evidenceShown}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
           
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-slate-700 text-slate-100 p-4 rounded-lg">
-                <LoadingSpinner size="sm" text="Đang suy nghĩ..." />
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Evidence Selection */}
-        {evidenceFound.length > 0 && (
-          <div className="mb-4">
-            <label className="text-sm text-slate-400 mb-2 block">
-              Trình bày bằng chứng (tùy chọn):
-            </label>
-            <select
-              value={selectedEvidence}
-              onChange={(e) => setSelectedEvidence(e.target.value)}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"
-            >
-              <option value="">Không có bằng chứng</option>
-              {evidenceFound.map((evidenceId) => {
-                const evidence = EVIDENCE_ITEMS[evidenceId];
-                return (
-                  <option key={evidenceId} value={evidenceId}>
-                    {evidence ? evidence.name : evidenceId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-        )}
-
-        {/* Input */}
-        <div className="flex space-x-2 md:space-x-3">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Đặt câu hỏi hoặc buộc tội..."
-            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 md:px-4 py-2 md:py-3 text-sm md:text-base text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
-            disabled={isLoading}
-          />
           <button
-            onClick={handleSendMessage}
-            disabled={!inputText.trim() || isLoading}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
+            onClick={() => setShowSmartQuestions(!showSmartQuestions)}
+            className={`px-3 py-1 text-xs rounded transition-colors ${
+              showSmartQuestions 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+            }`}
           >
-            Gửi
+            🤖 AI
           </button>
         </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 mb-3 md:mb-4 p-1 md:p-2">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'player' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`
+                    max-w-[85%] md:max-w-[80%] p-2 md:p-3 rounded-lg
+                    ${message.sender === 'player' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-slate-700 text-slate-100'
+                    }
+                  `}
+                >
+                  <p className="text-sm">{message.text}</p>
+                  {message.evidenceShown && (
+                    <div className="mt-2 pt-2 border-t border-slate-600">
+                      <p className="text-xs opacity-75">
+                        📋 Đã trình bày bằng chứng: {EVIDENCE_ITEMS[message.evidenceShown]?.name || message.evidenceShown}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-700 text-slate-100 p-4 rounded-lg">
+                  <LoadingSpinner size="sm" text="Đang suy nghĩ..." />
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Evidence Selection */}
+          {evidenceFound.length > 0 && (
+            <div className="mb-4">
+              <label className="text-sm text-slate-400 mb-2 block">
+                Trình bày bằng chứng (tùy chọn):
+              </label>
+              <select
+                value={selectedEvidence}
+                onChange={(e) => setSelectedEvidence(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"
+              >
+                <option value="">Không có bằng chứng</option>
+                {evidenceFound.map((evidenceId) => {
+                  const evidence = EVIDENCE_ITEMS[evidenceId];
+                  return (
+                    <option key={evidenceId} value={evidenceId}>
+                      {evidence ? evidence.name : evidenceId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
+
+          {/* Input */}
+          <div className="flex space-x-2 md:space-x-3">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Đặt câu hỏi hoặc buộc tội..."
+              className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 md:px-4 py-2 md:py-3 text-sm md:text-base text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputText.trim() || isLoading}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
+            >
+              Gửi
+            </button>
+          </div>
+        </div>
+        
+        {/* Right Panel - AI Suggestions */}
+        {showSmartQuestions && (
+          <div className="w-full md:w-80 flex-shrink-0 overflow-y-auto max-h-96 md:max-h-none">
+            <SmartQuestionPanel
+              character={character}
+              onQuestionSelect={handleQuestionSelect}
+              isVisible={true}
+            />
+
+            <QuickEvidenceIntegration
+              character={character}
+              onQuestionWithEvidence={handleQuestionWithEvidence}
+              isVisible={true}
+            />
+          </div>
+        )}
       </div>
     </Modal>
   );

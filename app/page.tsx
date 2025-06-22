@@ -11,12 +11,21 @@ import { AccusationModal } from '../src/components/game/AccusationModal';
 import InvestigationPanel from '../src/components/game/InvestigationPanel';
 import SearchArea from '../src/components/game/SearchArea';
 import APIStatusIndicator from '../src/components/game/APIStatusIndicator';
+import SaveLoadModal from '../src/components/game/SaveLoadModal';
+import AchievementModal from '../src/components/game/AchievementModal';
+import AchievementNotification from '../src/components/game/AchievementNotification';
+import DeductionBoard from '../src/components/game/DeductionBoard';
+import EvidenceTimeline from '../src/components/game/EvidenceTimeline';
 import Toast from '../src/components/ui/Toast';
 import { useGameStore } from '../src/stores/gameStore';
 import { Character } from '../src/types/game';
+import { type Achievement } from '../src/utils/achievements';
+import { useAchievements } from '../src/hooks/useAchievements';
+import { useNotification } from '../src/components/ui/NotificationSystem';
 
 export default function Home() {
-  const { gamePhase, currentRoom, evidenceFound, addEvidence, toast, hideToast } = useGameStore();
+  const { gamePhase, currentRoom, evidenceFound, toast, hideToast } = useGameStore();
+  const { showConfirm, showToast } = useNotification();
   const characters = getAliveCharacters();
   const allEvidence = getAllEvidence();
   const currentRoomData = getRoom(currentRoom);
@@ -27,6 +36,17 @@ export default function Home() {
   
   // Accusation modal state
   const [isAccusationOpen, setIsAccusationOpen] = useState(false);
+  
+  // Save/Load modal state
+  const [isSaveLoadOpen, setIsSaveLoadOpen] = useState(false);
+  const [saveLoadMode, setSaveLoadMode] = useState<'save' | 'load'>('save');
+  
+  // Achievement modal state
+  const [isAchievementOpen, setIsAchievementOpen] = useState(false);
+  const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
+  
+  // Deduction board modal state
+  const [isDeductionBoardOpen, setIsDeductionBoardOpen] = useState(false);
 
   const handleCharacterClick = (character: Character) => {
     setSelectedCharacter(character);
@@ -37,6 +57,16 @@ export default function Home() {
     setIsConversationOpen(false);
     setSelectedCharacter(null);
   };
+
+  // Achievement system integration
+  const handleAchievementUnlocked = (achievement: Achievement) => {
+    setNewAchievement(achievement);
+    // Auto-hide after showing
+    setTimeout(() => setNewAchievement(null), 6000);
+  };
+
+  // Hook to check for achievements
+  useAchievements(useGameStore.getState(), handleAchievementUnlocked);
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -88,6 +118,13 @@ export default function Home() {
         <div className="mb-6 md:mb-8">
           <InvestigationPanel />
         </div>
+
+        {/* Evidence Timeline */}
+        {evidenceFound.length > 0 && (
+          <div className="mb-6 md:mb-8">
+            <EvidenceTimeline />
+          </div>
+        )}
 
         {/* Characters Section */}
         <div className="mb-6 md:mb-8">
@@ -177,32 +214,70 @@ export default function Home() {
         </div>
 
         {/* Actions */}
-        <div className="text-center space-x-4">
-                      <button 
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+          <button 
+            className="bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
             onClick={() => setIsAccusationOpen(true)}
           >
             ⚖️ Buộc Tội
           </button>
+          
           <button 
-            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
             onClick={() => {
-              if (confirm('Bạn có chắc chắn muốn reset game?')) {
-                useGameStore.getState().resetGame();
+              setSaveLoadMode('save');
+              setIsSaveLoadOpen(true);
+            }}
+          >
+            💾 Lưu Game
+          </button>
+          
+          <button 
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
+            onClick={() => {
+              setSaveLoadMode('load');
+              setIsSaveLoadOpen(true);
+            }}
+          >
+            📂 Tải Game
+          </button>
+          
+          <button 
+            className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
+            onClick={() => setIsDeductionBoardOpen(true)}
+          >
+            🧩 Bảng Suy Luận
+          </button>
+          
+          <button 
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
+            onClick={() => setIsAchievementOpen(true)}
+          >
+            🏆 Thành Tích
+          </button>
+          
+          <button 
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors text-sm md:text-base shadow-lg hover:shadow-xl"
+            onClick={async () => {
+              const confirmed = await showConfirm({
+                title: 'Reset Game',
+                message: 'Bạn có chắc chắn muốn reset game? Tất cả tiến trình sẽ bị mất.',
+                confirmText: 'Reset',
+                cancelText: 'Hủy',
+                danger: true,
+                onConfirm: () => useGameStore.getState().resetGame()
+              });
+              
+              if (confirmed) {
+                showToast({
+                  type: 'success',
+                  title: 'Game đã được reset',
+                  message: 'Bạn có thể bắt đầu cuộc điều tra mới'
+                });
               }
             }}
           >
             🔄 Chơi Lại
-          </button>
-          <button 
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            onClick={() => {
-              // TODO: Add test evidence for demo
-              const testEvidence = ['wine_glass', 'threatening_letter'];
-              testEvidence.forEach(id => addEvidence(id));
-            }}
-          >
-            🧪 Thêm Bằng Chứng Test
           </button>
         </div>
       </main>
@@ -220,6 +295,31 @@ export default function Home() {
       <AccusationModal
         isOpen={isAccusationOpen}
         onClose={() => setIsAccusationOpen(false)}
+      />
+
+      {/* Save/Load Modal */}
+      <SaveLoadModal
+        isOpen={isSaveLoadOpen}
+        onClose={() => setIsSaveLoadOpen(false)}
+        mode={saveLoadMode}
+      />
+
+      {/* Achievement Modal */}
+      <AchievementModal
+        isOpen={isAchievementOpen}
+        onClose={() => setIsAchievementOpen(false)}
+      />
+
+      {/* Deduction Board Modal */}
+      <DeductionBoard
+        isOpen={isDeductionBoardOpen}
+        onClose={() => setIsDeductionBoardOpen(false)}
+      />
+
+      {/* Achievement Notification */}
+      <AchievementNotification
+        achievement={newAchievement}
+        onClose={() => setNewAchievement(null)}
       />
 
       {/* API Status Indicator */}

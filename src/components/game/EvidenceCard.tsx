@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Evidence } from '../../types/game';
 import { useGameStore } from '../../stores/gameStore';
 import Image from 'next/image';
+import EvidenceAnalysisGame from './EvidenceAnalysisGame';
+import ImageAnalysis from './ImageAnalysis';
 
 interface EvidenceCardProps {
   evidence: Evidence;
@@ -19,6 +22,8 @@ export default function EvidenceCard({
 }: EvidenceCardProps) {
   const { evidenceFound } = useGameStore();
   const isDiscovered = evidenceFound.includes(evidence.id);
+  const [showAnalysisGame, setShowAnalysisGame] = useState(false);
+  const [showImageAnalysis, setShowImageAnalysis] = useState(false);
   
   // Evidence rarity color based on importance
   const getRarityColor = () => {
@@ -122,6 +127,33 @@ export default function EvidenceCard({
             </p>
           </div>
         )}
+
+        {/* Analysis Buttons for discovered evidence */}
+        {isDiscovered && showDetails && (
+          <div className="mt-3 pt-3 border-t border-slate-700 space-y-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAnalysisGame(true);
+              }}
+              className="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              🔬 Phân tích chi tiết
+            </button>
+            
+            {evidence.image && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowImageAnalysis(true);
+                }}
+                className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                📸 Phân tích ảnh
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Discovered indicator */}
@@ -129,6 +161,32 @@ export default function EvidenceCard({
         <div className="absolute top-2 left-2">
           <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
         </div>
+      )}
+
+      {/* Analysis Game Modal */}
+      {showAnalysisGame && (
+        <EvidenceAnalysisGame
+          isOpen={showAnalysisGame}
+          onClose={() => setShowAnalysisGame(false)}
+          evidence={evidence}
+          onComplete={(success, insights) => {
+            console.log('Analysis completed:', { success, insights });
+            setShowAnalysisGame(false);
+          }}
+        />
+      )}
+
+      {/* Image Analysis Modal */}
+      {showImageAnalysis && (
+        <ImageAnalysis
+          isOpen={showImageAnalysis}
+          onClose={() => setShowImageAnalysis(false)}
+          evidence={evidence}
+          onDiscovery={(findings) => {
+            console.log('Image analysis findings:', findings);
+            // Could integrate with achievements or game state
+          }}
+        />
       )}
     </div>
   );
